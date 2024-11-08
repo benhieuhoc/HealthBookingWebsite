@@ -1,0 +1,23 @@
+{
+  "name": "doanchuyennganh",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --inspect src\\index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "healthbooking"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "express-handlebars": "^8.0.1",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.7"
+  }
+}
