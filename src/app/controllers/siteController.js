@@ -1,12 +1,22 @@
+const Department = require ('../models/department');
+const { mutipleMongoosetoObject } = require('../../util/mongoose');
+
 class SiteController {
 
     // Get /home
     home(req,res,next){
-        res.render('home');
+        res.render('home');        
     }
 
+    // Get /booking
     booking(req,res,next){
-        res.render('booking');
+        Department.find({})
+        .then((department) => {                      
+            res.render('booking', {
+                department: mutipleMongoosetoObject(department),                
+            });
+        })
+        .catch(next);
     }
 };
 

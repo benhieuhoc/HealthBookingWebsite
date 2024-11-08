@@ -9,8 +9,11 @@ const handlebars = require ('express-handlebars');
 const router = require ('./router/index');
 // Khai báo path
 const path = require('path');
+// Khai báo db
+const db = require ('./config/db');
 
-
+//Kết nối db
+db.connect();
 // Triển khai morgan
 app.use(morgan('combined'));
 
@@ -21,6 +24,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.engine('.hbs', handlebars.engine({extname: '.hbs'}));
 app.set('view engine', 'hbs');
 app.set('views', './src/resources/views');
+
+// Triển khai middleware để phân tích dưc liệu URL-encoded
+app.use(express.urlencoded({ extended: true }));
 
 // Triển khai router
 router(app);
