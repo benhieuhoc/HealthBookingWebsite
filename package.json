@@ -13,10 +13,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "mongoose": "^8.8.0",
+    "mongoose-delete": "^1.0.2"
   },
   "devDependencies": {
     "express-handlebars": "^8.0.1",
+    "mongoose-sequence": "^6.0.1",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.7"
   }
