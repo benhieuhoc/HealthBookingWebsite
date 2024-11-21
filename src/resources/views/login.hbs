@@ -1,16 +1,122 @@
-<div></div>
-<h3>Đăng nhập</h3>
-<form method="POST" action="/home">
-    <div>
-            <label for="email">Gmail</label>
-            <input type="text" name="email">
-    </div>
-    <div>
-            <label for="password">Mật khẩu</label>
-            <input type="text" name="password">
-    </div>
-    <button type='submit' class='btn btn-primary'>Đăng nhập</button>
-    <button type='submit' class='btn btn-primary'>Đăng kí</button>
+<!-- LOGIN IMAGE -->
+<svg class="login__blob" viewBox="0 0 566 840" xmlns="http://www.w3.org/2000/svg">
+        <mask id="mask0" mask-type="alpha">
+        <path d="M342.407 73.6315C388.53 56.4007 394.378 17.3643 391.538 
+        0H566V840H0C14.5385 834.991 100.266 804.436 77.2046 707.263C49.6393 
+        591.11 115.306 518.927 176.468 488.873C363.385 397.026 156.98 302.824 
+        167.945 179.32C173.46 117.209 284.755 95.1699 342.407 73.6315Z"/>
+        </mask>
 
-</form>
+        <g mask="url(#mask0)">
+        <path d="M342.407 73.6315C388.53 56.4007 394.378 17.3643 391.538 
+        0H566V840H0C14.5385 834.991 100.266 804.436 77.2046 707.263C49.6393 
+        591.11 115.306 518.927 176.468 488.873C363.385 397.026 156.98 302.824 
+        167.945 179.32C173.46 117.209 284.755 95.1699 342.407 73.6315Z"/>
+
+        <!-- size: 1000 x 1200 -->
+        <image class="login__img" href="/images/login.png"/>
+        </g>
+</svg>      
+<!-- LOGIN -->
+<div class="login container grid" id="loginAccessRegister">
+        <!-- LOGIN ACCESS -->
+        <div class="login__access">
+                <h1 class="login__title">Đăng nhập</h1>
+                
+                <div class="login__area">
+                        <form method="POST" action="/home" class="login__form">
+                                <div class="login__content grid">
+                                <div class="login__box">
+                                <input type="email" name="email" id="email" required placeholder=" " class="login__input">
+                                <label for="email" class="login__label">Email</label>
+                        
+                                <i class="ri-mail-fill login__icon"></i>
+                                </div>
+                        
+                                <div class="login__box">
+                                <input type="password" name="password" id="password" required placeholder=" " class="login__input">
+                                <label for="password" class="login__label">Mật khẩu</label>
+                        
+                                <i class="ri-eye-off-fill login__icon login__password" id="loginPassword"></i>
+                                </div>
+                                </div>
+                        
+                                <a href="#" class="login__forgot">Quên mật khẩu?</a>
+                        
+                                <button type="submit" id="setlayout" class="login__button">Đăng nhập</button>
+                        </form>
+
+                        <div class="login__social">
+                                <p class="login__social-title">Đăng nhập với</p>
+
+                                <div class="login__social-links">
+                                <a href="#" class="login__social-link">
+                                <img src="/images/icon-google.svg" alt="image" class="login__social-img">
+                                </a>
+
+                                <a href="#" class="login__social-link">
+                                <img src="/images/icon-facebook.svg" alt="image" class="login__social-img">
+                                </a>
+
+                                <a href="#" class="login__social-link">
+                                <img src="/images/icon-apple.svg" alt="image" class="login__social-img">
+                                </a>
+                                </div>
+                        </div>
+
+                        <p class="login__switch">
+                                Bạn không có tài khoản? 
+                                <button id="loginButtonRegister">Đăng ký</button>
+                        </p>
+                </div>
+        </div>
+
+        <!-- LOGIN REGISTER -->
+        <div class="login__register">
+                <h1 class="login__title">Đăng ký tài khoản</h1>
+
+                <div class="login__area">
+                        <form method="" action="" class="login__form">
+                                <div class="login__content grid">
+                                <div class="login__group grid">
+                                <div class="login__box">
+                                        <input type="text" id="names" required placeholder=" " class="login__input">
+                                        <label for="names" class="login__label">Họ</label>
+
+                                        <i class="ri-id-card-fill login__icon"></i>
+                                </div>
+
+                                <div class="login__box">
+                                        <input type="text" id="surnames" required placeholder=" " class="login__input">
+                                        <label for="surnames" class="login__label">Tên</label>
+
+                                        <i class="ri-id-card-fill login__icon"></i>
+                                </div>
+                                </div>
+
+                                <div class="login__box">
+                                <input type="email" id="emailCreate" required placeholder=" " class="login__input">
+                                <label for="emailCreate" class="login__label">Email</label>
+
+                                <i class="ri-mail-fill login__icon"></i>
+                                </div>
+
+                                <div class="login__box">
+                                <input type="password" id="passwordCreate" required placeholder=" " class="login__input">
+                                <label for="passwordCreate" class="login__label">Mật khẩu</label>
+
+                                <i class="ri-eye-off-fill login__icon login__password" id="loginPasswordCreate"></i>
+                                </div>
+                                </div>
+
+                                <button type="submit" class="login__button">Tạo tài khoản</button>
+                        </form>
+
+                        <p class="login__switch">
+                                Đã có tài khoản? 
+                                <button id="loginButtonAccess">Đăng nhập</button>
+                        </p>
+                </div>
+        </div>
+</div>
 

@@ -21,11 +21,12 @@ class SiteController {
             if (user && user.password === req.body.password)
             {
                 req.session.user = user;
-                res.locals.user= user;
-                res.render('home');
+                 res.locals.user= req.session.user,
+                // res.json(res.locals.user);
+                res.redirect('home');
             }
             else{
-                alert("Email hoặc mật khẩu sai");
+                res.status("Email hoặc mật khẩu sai");
             };
         })
         .catch(next);
@@ -45,7 +46,8 @@ class SiteController {
     // Get /logout
     logout(req,res,next){
         req.session.destroy(() => {
-                res.render('login');
+            res.locals.user = null;
+            res.render('login');
         });
     }
 };

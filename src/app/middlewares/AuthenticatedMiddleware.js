@@ -4,8 +4,6 @@ function AuthenticatedMiddleware (req, res,next){
         res.locals.user= req.session.user;
         // res.json(req.session.user); 
         // res.session.user.destroy();
-
-        next();
     }
     else{
         // res.locals._sort = {
@@ -16,7 +14,7 @@ function AuthenticatedMiddleware (req, res,next){
         //     role: 'null',
         // }
         // res.json('chưa đang nhập');
-        next();
     }
+    next();
 }
 module.exports = AuthenticatedMiddleware
