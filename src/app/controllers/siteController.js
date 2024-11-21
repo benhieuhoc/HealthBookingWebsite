@@ -21,9 +21,9 @@ class SiteController {
             if (user && user.password === req.body.password)
             {
                 req.session.user = user;
-                 res.locals.user= req.session.user,
-                // res.json(res.locals.user);
-                res.redirect('home');
+                res.locals.user= req.session.user,
+                res.json(user);
+                // res.redirect('home');
             }
             else{
                 res.status("Email hoặc mật khẩu sai");
@@ -50,6 +50,19 @@ class SiteController {
             res.render('login');
         });
     }
+    
+    //POST /register
+    async register(req,res,next){
+        const FormData = new User({
+            name: req.body.surnames,
+            email: req.body.emailCreate,
+            password: req.body.passwordCreate,
+            role: "user",
+        });
+        await FormData.save();
+        res.redirect('/');
+    }
+
 };
 
 module.exports = new SiteController;

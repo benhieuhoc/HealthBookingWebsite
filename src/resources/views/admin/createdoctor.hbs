@@ -1,0 +1,26 @@
+<form method="POST" action="/admin/adddoctor" >
+                                <div class="login__content grid">
+                                    <div class="login__group grid">
+                                        <div class="login__box">
+                                                <input type="text" name="name" id="surnames" required placeholder=" " class="login__input">
+                                                <label for="surnames" class="login__label">Họ Tên</label>
+                                                <i class="ri-id-card-fill login__icon"></i>
+                                        </div>
+                                        <label for="select">Chọn khoa</label>
+                                        <select class="form-control" name="department">
+                                                {{#each department}}
+                                                <option>{{this.name}}</option>
+                                                {{/each}}
+                                        </select>
+                                    </div>
+
+                                    <div class="login__box">
+                                    <input type="email" name="email" id="emailCreate" required placeholder=" " class="login__input">
+                                    <label for="emailCreate" class="login__label">Email</label>
+
+                                    <i class="ri-mail-fill login__icon"></i>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="login__button">Tạo tài khoản</button>
+                        </form>

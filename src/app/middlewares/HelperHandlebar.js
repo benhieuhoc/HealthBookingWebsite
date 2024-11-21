@@ -1,6 +1,7 @@
 const Handlebar = require('handlebars');
 
 module.exports = {
+    sum: (a, b) => a + b,
     layout_button: (user) => {
         if(user){
             if(user.role === 'user'){
@@ -11,6 +12,13 @@ module.exports = {
                 <li><a href="#news" class="smoothScroll">Tin tức</a></li>
                 <li><a href="#google-map" class="smoothScroll">Liên hệ</a></li>
                 <li class="appointment-btn"><a href="/booking">Đặt lịch</a></li>
+                <li><a href="/logout" class="smoothScroll">Đăng xuất</a></li>`;
+                return new Handlebar.SafeString(userlaypout);
+            }
+
+            if(user.role === 'admin'){
+                const href1 =  Handlebar.escapeExpression(`/admin/managerdoctor`);
+                const userlaypout = `<li><a href="${href1}" class="smoothScroll">Quản lý bác sĩ</a></li>
                 <li><a href="/logout" class="smoothScroll">Đăng xuất</a></li>`;
                 return new Handlebar.SafeString(userlaypout);
             }

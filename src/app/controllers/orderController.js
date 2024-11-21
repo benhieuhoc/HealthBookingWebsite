@@ -1,4 +1,3 @@
-const { create } = require('connect-mongo');
 const Order = require ('../models/order');
 
 class OrderController {
@@ -17,9 +16,8 @@ class OrderController {
         await FormData.save();
         res.redirect('/home');
     }
-    created(req,res,next) {
-        res.json(req.session.user);
-    }
+
+    
 };
 
 

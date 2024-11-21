@@ -76,33 +76,26 @@
                 <h1 class="login__title">Đăng ký tài khoản</h1>
 
                 <div class="login__area">
-                        <form method="" action="" class="login__form">
+                        <form method="POST" action="/register" class="login__form">
                                 <div class="login__content grid">
                                 <div class="login__group grid">
                                 <div class="login__box">
-                                        <input type="text" id="names" required placeholder=" " class="login__input">
-                                        <label for="names" class="login__label">Họ</label>
-
-                                        <i class="ri-id-card-fill login__icon"></i>
-                                </div>
-
-                                <div class="login__box">
-                                        <input type="text" id="surnames" required placeholder=" " class="login__input">
-                                        <label for="surnames" class="login__label">Tên</label>
+                                        <input type="text" name="surnames" id="surnames" required placeholder=" " class="login__input">
+                                        <label for="surnames" class="login__label">Họ Tên</label>
 
                                         <i class="ri-id-card-fill login__icon"></i>
                                 </div>
                                 </div>
 
                                 <div class="login__box">
-                                <input type="email" id="emailCreate" required placeholder=" " class="login__input">
+                                <input type="email" name="emailCreate" id="emailCreate" required placeholder=" " class="login__input">
                                 <label for="emailCreate" class="login__label">Email</label>
 
                                 <i class="ri-mail-fill login__icon"></i>
                                 </div>
 
                                 <div class="login__box">
-                                <input type="password" id="passwordCreate" required placeholder=" " class="login__input">
+                                <input type="password" name="passwordCreate" id="passwordCreate" required placeholder=" " class="login__input">
                                 <label for="passwordCreate" class="login__label">Mật khẩu</label>
 
                                 <i class="ri-eye-off-fill login__icon login__password" id="loginPasswordCreate"></i>
