@@ -1,0 +1,59 @@
+<form class='mt-4' method="POST" name="container-form" action="/courses/handle-form-actions">
+  <div>
+    <h3>Danh sách Admin</h3>
+  </div>
+  <table class='table mt-4'>
+    <thead>
+      <tr>
+        <th scope='col'>#</th>
+        <th scope='col'>Tên tài khoản</th>
+        <th scope="col">email</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each user}}
+        <tr>
+          {{!-- <td>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="courseIds[]" value="{{this._id}}" >
+            </div>
+          </td> --}}
+          <th scope='row'>{{sum @index 1}}</th>
+          <td>{{this.name}}</td>
+          <td>{{this.email}}</td>
+          <td>
+            <a type="button" class='btn btn-link' href="/admin/managerdoctor?department={{this.name}}">Xem chi tiết</a>
+          </td>
+        </tr>
+        {{else}}
+        <tr>
+          <td colspan="5" class="text-center">Chưa có bác sĩ!
+            <a href="/admin/createdoctor">Thêm bác sĩ</a>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</form>
+
+{{!-- Confirm delete --}}
+<div id="delete-course-modal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Bạn muốn xóa khóa học này?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Bác sĩ này sẽ bị xóa khỏi danh sách bác sĩ. Bạn chắc chắn muốn xóa chứ?</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-delete-course" type="button" class="btn btn-danger">Xóa</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+      </div>
+    </div>
+  </div>
+</div>
+

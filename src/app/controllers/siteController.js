@@ -22,8 +22,8 @@ class SiteController {
             {
                 req.session.user = user;
                 res.locals.user= req.session.user,
-                res.json(user);
-                // res.redirect('home');
+                // res.json(user);
+                res.redirect('home');
             }
             else{
                 res.status("Email hoặc mật khẩu sai");
@@ -32,14 +32,20 @@ class SiteController {
         .catch(next);
     }
 
-    // Get /booking
-    booking(req,res,next){
-        Department.find({})
-        .then((department) => {                      
-            res.render('booking', {
-                department: mutipleMongoosetoObject(department),                
-            });
-        })
+    // Get /profile
+    profile(req,res,next){
+        res.json(res.locals.user);
+    }
+
+    // Get /editprofile
+    editprofile(req,res,next){
+        res.json(res.locals.user);
+    }
+
+    // Put /updateprofile
+    updateprofile(req,res,next){
+        User.updateOne({_id: res.locals.user.id}, req.body)
+        then(() => res.redirect('/editprofile'))
         .catch(next);
     }
 

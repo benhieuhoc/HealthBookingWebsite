@@ -1,9 +1,18 @@
-<form class='mt-4' method="POST" name="container-form" action="/courses/handle-form-actions">
+<form class='mt-4' method="Get" name="container-form" action="/admin/managerdoctor/">
   <div>
     <h3>Danh sách bác sĩ</h3>
-    <td colspan="5" class="text-center">Thêm bác sĩ tại đây    
-      <a href="/admin/createdoctor">Thêm bác sĩ</a>
+    <td colspan="5" class="text-center">Thêm Admin tại đây    
+      <a href="/admin/createdoctor">Thêm admin</a>
     </td>
+  </div>
+  <div class="col-md-6 col-sm-6">
+    <label for="select">Chọn khoa</label>
+    <select id="select" class="form-control" name="department" data-target="#name-department">
+        {{#each department}}
+            <option value="{{this.name}}">{{this.name}}</option>
+        {{/each}}
+    </select>
+    <button id="btn_select_department" class="btn btn-primary btn-sm">Tìm kiếm</button>
   </div>
   <table class='table mt-4'>
     <thead>
@@ -20,15 +29,9 @@
     <tbody>
       {{#each user}}
         <tr>
-          {{!-- <td>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="courseIds[]" value="{{this._id}}" >
-            </div>
-          </td> --}}
           <th scope='row'>{{sum @index 1}}</th>
           <td>{{this.name}}</td>
           <td>{{this.email}}</td>
-          <td>{{this.department}}</td>
           <td>
             <a type="button" class='btn btn-link' data-toggle="modal" data-id="{{this._id}}" data-target="#delete-course-modal" >Xoá</a>
           </td>
@@ -44,7 +47,6 @@
   </table>
 </form>
 
-{{!-- Confirm delete --}}
 <div id="delete-course-modal" class="modal" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -65,3 +67,23 @@
   </div>
 </div>
 
+<form name="find_department_form" action=""></form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var findform = document.forms['find_department_form'];
+    var btnSelectDepartment = document.getElementById('btn_select_department');
+    var selectDepartment = $('#select');
+    var name
+
+    selectDepartment.change(function () {
+      var output = document.querySelector('#select').value;
+      name = output
+    });
+
+    btnSelectDepartment.onclick = function{
+      findform.action = "admin/managerdoctor/"+ name;
+      findform.submit();
+    }
+  })
+</script>
