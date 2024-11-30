@@ -1,7 +1,7 @@
-const Calender = require ('../models/Calender');
-const Department = require ('../models/department');
-const Order = require ('../models/Order');
-const User = require ('../models/User')
+const Calender = require ('../models/Booking');
+const Department = require ('../models/Department');
+const Order = require ('../models/Position');
+const User = require ('../models/Admin')
 const Shift = require ('../models/Shift');
 const { mutipleMongoosetoObject } = require('../../util/mongoose');
 
@@ -118,6 +118,13 @@ class AdminController {
     deleteOrder(req,res,next){
         Order.deleteOne({_id: req.param.id})
         .then(() => res.redirect('/admin/managerorder'))
+    }
+
+    //Get /admin/manageruser
+    managerUser(req,res,next){
+        User.find({role: 'user'})
+        .then((user) => res.json(user))
+        .catch(next);
     }
 
 }

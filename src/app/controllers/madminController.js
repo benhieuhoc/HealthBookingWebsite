@@ -1,6 +1,6 @@
-const Department = require ('../models/department');
-const Order = require ('../models/Order');
-const User = require ('../models/User');
+const Department = require ('../models/Department');
+const Order = require ('../models/Admin');
+const User = require ('../models/Admin');
 
 class MAdminController {
     

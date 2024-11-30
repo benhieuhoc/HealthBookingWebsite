@@ -1,6 +1,6 @@
-const Department = require ('../models/department');
-const Calender = require ('../models/Calender');
-const Order = require ('../models/Order');
+const Department = require ('../models/Department');
+const Calender = require ('../models/Admin');
+const Order = require ('../models/Admin');
 const { mutipleMongoosetoObject } = require('../../util/mongoose');
 
 class OrderController {
@@ -61,6 +61,20 @@ class OrderController {
         // res.json(FormData);
         await FormData.save();
         res.redirect('/home');
+    }
+
+    // Patch /order/checkin/:id
+    checkin(req,res,next){
+        Order.findOneAndUpdate({_id: req.params.id}, {checkin: true})
+        .then(() => res.redirect('/doctor/calender'))
+        .catch(next);
+    }
+
+    // Patch /order/setdone/:id
+    setdone(req,res,next){
+        Order.findOneAndUpdate({_id: req.params.id}, {done: true})
+        .then(() => res.redirect('/doctor/calender'))
+        .catch(next);
     }
     
 };

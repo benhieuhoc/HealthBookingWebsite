@@ -1,10 +1,10 @@
-const mongoose = require ('mongoose');
+const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
-const ShiftSchema = new Schema({
-    name: {type: String, minLength: 1},
-    start: {type: String},
-    stop: {type: String},
-});
-
-module.exports = new mongoose.model('Shift', ShiftSchema);
+const ShiftSchema = new mongoose.Schema({        
+        tenGio: { type: String },
+    },
+    { 
+        timestamps: true,   // createAt, updateAt
+    }
+);
+module.exports = mongoose.model("Shift", ShiftSchema);
