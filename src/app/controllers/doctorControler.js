@@ -1,4 +1,10 @@
-const Doctor = require('../models/Doctor')
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const Doctor = require('../models/Doctor');
+const Role = require('../models/Role');
+require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET;
+
 
 class DoctorController {
 
@@ -107,7 +113,7 @@ class DoctorController {
     }
 
     // Get /doctor/show-all-doctor
-    showall(req,res,next){
+    async showall(req,res,next){
         const { page, limit, firstName, lastName, address } = req.query; // Lấy trang và kích thước trang từ query
         // Chuyển đổi thành số
         const pageNumber = parseInt(page, 10);
@@ -115,21 +121,34 @@ class DoctorController {
         // Tính toán số bản ghi bỏ qua
         const skip = (pageNumber - 1) * limitNumber;
         const query = {};
+        if (firstName || lastName || address) {
+            const searchKeywords = (firstName || '') + ' ' + (lastName || '') + ' ' + (address || '');
+            const keywordsArray = searchKeywords.trim().split(/\s+/);
 
-        Doctor.find({query})
-        .then(async(doctor) => {
-            doctor
-                .populate("chucVuId chuyenKhoaId phongKhamId roleId")
-                .populate({
-                    path: 'thoiGianKham.thoiGianId', // Đường dẫn đến trường cần populate
-                    // model: 'ThoiGianGio' // Tên model của trường cần populate
-                })
-                .skip(skip)
-                .limit(limitNumber);
-            const totalDoctors = await Doctor.countDocuments(query); // Đếm tổng số bác sĩ
-            const totalPages = Math.ceil(totalDoctors / limitNumber); // Tính số trang
+            const searchConditions = keywordsArray.map(keyword => ({
+                $or: [
+                    { firstName: { $regex: keyword, $options: 'i' } },
+                    { lastName: { $regex: keyword, $options: 'i' } },
+                    { address: { $regex: keyword, $options: 'i' } },
+                ]
+            }));
+
+            query.$or = searchConditions;
+        }
+        const totalDoctors = await Doctor.countDocuments(query); // Đếm tổng số bác sĩ
+        const totalPages = Math.ceil(totalDoctors / limitNumber); // Tính số trang
+
+        Doctor.find(query)
+        .populate("chucVuId chuyenKhoaId  roleId") // thêm  phongKhamId
+        .populate({
+            path: 'thoiGianKham.thoiGianId', // Đường dẫn đến trường cần populate
+            // model: 'ThoiGianGio' // Tên model của trường cần populate
+        })
+        .skip(skip)
+        .limit(limitNumber)
+        .then((doctor) => {
             return res.status(200).json({
-                data: fetchAll,
+                data: doctor,
                 totalDoctors,
                 totalPages,
                 currentPage: pageNumber,
@@ -215,7 +234,7 @@ class DoctorController {
         })
     }
 
-    // Delete /doctor/delete-doctor
+    // Delete /doctor/delete-doctor/:id
     delete(req, res,error){
         const _id = req.params.id
         Doctor.deleteOne({_id: _id})

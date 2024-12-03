@@ -1,74 +1,62 @@
-const Department = require ('../models/Department');
-const Order = require ('../models/Admin');
-const User = require ('../models/Admin');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const Madmin = require('../models/Admin')
+require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET;
 
 class MAdminController {
     
-    // Get /madmin/createdepartment
-    createDepartment(req,res,next){
-        res.render('');
-    };
+    // Post /madmin/login-madmin
+    login(req,res,next){
+        const {email, password} = req.body;
+        try{
+            Madmin.findOne({email: email})
+            .then(async (madmin) => {
+                if(!madmin){
+                    return res.status(401).json({ message: 'Email không tồn tại!'})
+                }
+                const saltRounds = 10;
+                const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Post /madmin/adddepartment
-    async addDepartment(req,res,next){
-        const FormData = new Department ({
-            name: req.body.name,
-        })
-        await FormData.save();
-        res.redirect('/admin/managerdepartment');
-    };
+                console.log("Madmin.password: ",madmin.password);
+                console.log("password: ",password);
+                console.log("hashedPassword: ",hashedPassword);
+                console.log('EXPIRESIN:', process.env.EXPIRESIN);
 
-    // Delete /madmin/removedepartment/:id
-    removeDepartment(req,res,next){
-        Department.deleteOne({_id: req.param.id})
-        .then(() => res.redirect('back'))
-        .catch(next);
-    };
+                const isMatch = await bcrypt.compare(password, madmin.password);
+                if(!isMatch){
+                    return res.status(401).json({ message: 'Mật khẩu không đúng!'});
+                }
 
-    // Get /madmin/manageradmin
-    managerAdmin(req,res,next){
-        User.find({role: 'admin'})
-        .then((user) => res.json(user))
-        .catch(next);
+                const token = jwt.sign(
+                    { madmin: madmin._id, email: madmin.email },
+                    JWT_SECRET,
+                    { expiresIn: process.env.EXPIRESIN }
+                );
+                
+                res.json({ message: 'Đăng nhập thành công', access_token: token, data: madmin });
+            })
+
+        }catch (error){
+            res.status(500).json({ message: 'Lỗi máy chủ' });
+        }
     }
 
-    // Get /madmin/createAdmin
-    createAdmin(req,res,next){
-        res.render('');
+    // Post /madmin/logout-madmin
+    logout(req,res,next){
+        try{
+            res.clearCookie('token', {
+                httpOnly: true,
+                secure: process.env.NODE.ENV === 'production',
+            });
+
+            res.status(200).json({ message : 'Đăng xuất thành công'});
+        }catch (error){
+            res.status(500).json({ message: 'Lỗi máy chủ'});
+        }
     }
 
-    // Post /madmin/addadmin
-    async addAdmin(req,res,next){
-        const FormData = new User ({
-            name: req.body.name,
-            email: req.body.email,
-            role: 'admin',
-            password: '123',
-        });
-         await FormData.save();
-        res.redirect('/madmin/manageradmin');
-    }
-
-    // Delete /madmin/removeadmin/:id
-    removeAdmin(req,res,next){
-        User.deleteOne({_id: req.param.id})
-        .then(() => res.redirect('back'))
-        .catch(next);
-    }
-
-    // Get /madmin/force-dlt-order
-    listdDltOrdeer(req,res,next){
-        Order.findDeleted({})
-        .then((order) => res.json(order))
-        .catch(next);
-    }
-
-    // Patch /madmin/restore/:id
-    async restore(req,res,next){
-        Order.restore({_id: req.params.id})
-        .then(() => res.redirect('/madmin/force-dlt-order'))
-        .catch(next);
-    }
+    
 
 };
 

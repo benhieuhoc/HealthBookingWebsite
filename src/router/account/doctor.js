@@ -9,7 +9,7 @@ router.get('/show-all-doctor', doctorcontroller.showall);
 router.get('/show-doctor-byId', doctorcontroller.showbyid);
 router.get('/show-doctor-by-department', doctorcontroller.showbydepartment);
 router.put('/update-doctor', doctorcontroller.update);
-router.delete('/delete-doctor', doctorcontroller.delete)
+router.delete('/delete-doctor/:id', doctorcontroller.delete)
 
 
 // Dùng cho page đặt lịch

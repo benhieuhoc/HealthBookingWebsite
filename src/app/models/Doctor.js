@@ -22,7 +22,7 @@ const DoctorSchema = new mongoose.Schema({
     thoiGianKham: [
         {
             date: { type: String, required: true }, // Ngày khám
-            thoiGianId: [{ ref: "ThoiGianGio", type: mongoose.SchemaTypes.ObjectId }] // Mảng chứa các thoiGianId
+            thoiGianId: [{ ref: "Shift", type: mongoose.SchemaTypes.ObjectId }] // Mảng chứa các thoiGianId
         }
     ],      
 },

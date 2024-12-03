@@ -1,9 +1,10 @@
 const adminController = require ('./account/admin');
 const departmentController = require ('./department');
 const doctorController = require ('./account/doctor');
-const MadminController = require ('./madmin');
+const MadminController = require ('./account/madmin');
 const orderController = require ('./order');
-const positionController = require ('./position')
+const patientController = require('./account/patient');
+const positionController = require ('./position');
 const siteController = require ('./site');
 
 
@@ -13,6 +14,7 @@ function route(app) {
     app.use('/doctor', doctorController);
     app.use('/madmin', MadminController),
     app.use('/order', orderController);
+    app.use('/patient',patientController);
     app.use('/position', positionController);
     app.use('/', siteController);
 }

@@ -53,7 +53,7 @@ class departmentController {
             const skip = Math.max((pageNumber - 1) * limitNumber, 0);
             const query = {};
 
-            const totalChuyenKhoa = await ChuyenKhoa.countDocuments(query); // Đếm tổng số chuyên khoa
+            const totalChuyenKhoa = await Department.countDocuments(query); // Đếm tổng số chuyên khoa
             const totalPages = Math.ceil(totalChuyenKhoa / limitNumber); // Tính số trang
             
             Department.find({})
