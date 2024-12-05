@@ -53,15 +53,24 @@ class departmentController {
             const skip = Math.max((pageNumber - 1) * limitNumber, 0);
             const query = {};
 
+            if (name) {
+                const searchKeywords = (name || '')
+                const keywordsArray = searchKeywords.trim().split(/\s+/);
+
+                const searchConditions = keywordsArray.map(keyword => ({
+                    name: { $regex: keyword, $options: 'i' } // Tìm kiếm không phân biệt chữ hoa chữ thường
+                }));
+
+                query.$or = searchConditions;
+            }
+
             const totalChuyenKhoa = await Department.countDocuments(query); // Đếm tổng số chuyên khoa
             const totalPages = Math.ceil(totalChuyenKhoa / limitNumber); // Tính số trang
             
             Department.find({})
+            .skip(skip)
+            .limit(limitNumber)
             .then((department) => {
-                department
-                .skip(skip)
-                .limit(limitNumber)
-                
                 return res.status(200).json({
                     data: department,
                     totalChuyenKhoa,

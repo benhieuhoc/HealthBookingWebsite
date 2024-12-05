@@ -16,7 +16,7 @@ const DoctorSchema = new mongoose.Schema({
     gender: { type: Boolean },        
     image: { type: String },         
     chuyenKhoaId: [{ref: "Department", type: mongoose.SchemaTypes.ObjectId}],                  
-    // phongKhamId: {ref: "PhongKham", type: mongoose.SchemaTypes.ObjectId},                  
+    phongKhamId: {ref: "Clinic", type: mongoose.SchemaTypes.ObjectId},                  
     roleId: {ref: "Role", type: mongoose.SchemaTypes.ObjectId, default: defaultRoleId},  
     mota:   { type: String },           
     thoiGianKham: [

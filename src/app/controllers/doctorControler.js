@@ -139,7 +139,7 @@ class DoctorController {
         const totalPages = Math.ceil(totalDoctors / limitNumber); // Tính số trang
 
         Doctor.find(query)
-        .populate("chucVuId chuyenKhoaId  roleId") // thêm  phongKhamId
+        .populate("chucVuId chuyenKhoaId phongKhamId roleId") // thêm  phongKhamId
         .populate({
             path: 'thoiGianKham.thoiGianId', // Đường dẫn đến trường cần populate
             // model: 'ThoiGianGio' // Tên model của trường cần populate
@@ -249,6 +249,47 @@ class DoctorController {
                 message: "Bạn đã xoá tài khoản bác sĩ thất bại!"
             })
         })
+    }
+
+    // Post /doctor/add-shift
+    addshift(req,res,next){
+        const { date, time, _id } = req.body;
+        console.log("date: ", date);
+        console.log("time: ", time);
+        console.log("_id: ", _id);
+            
+        try{
+            Doctor.findById(_id)
+            .then(async(doctor) => {
+                if(!doctor){
+                    return res.status(404).json({ message: 'Bác sĩ không tồn tại!' });
+                }
+
+                const requestDate = moment(date, 'DD-MM-YYYY').startOf('day').format('YYYY-MM-DD');
+                if (!moment(requestDate, 'YYYY-MM-DD', true).isValid()) {
+                    return res.status(400).json({ message: 'Ngày không hợp lệ!' });
+                }
+
+                const existingTimeSlot = doctor.thoiGianKham.find(slot => slot.date === requestDate);
+                if (existingTimeSlot) {
+                    // Update existing time slot
+                    const existingTimeIds = existingTimeSlot.thoiGianId.map(id => id.toString());
+                    const newTimeIds = time.filter(timeId => !existingTimeIds.includes(timeId));
+                    existingTimeSlot.thoiGianId = [...new Set([...existingTimeSlot.thoiGianId, ...newTimeIds])];
+                } else {
+                    // Create a new time slot if none exists
+                    doctor.thoiGianKham.push({ date: requestDate, thoiGianId: time });
+                }
+
+            await doctor.removeExpiredTimeSlots();
+            await doctor.save();
+            return res.status(200).json({ message: 'Cập nhật lịch trình khám bệnh thành công!', data: doctor });
+            })
+            .catch(next);
+        }catch (error){
+            console.error(error);
+            return res.status(500).json({ message: 'Có lỗi xảy ra!', error });
+        }
     }
 
     // Get /doctor/show-doctor-whith-listbooking

@@ -14,8 +14,8 @@ class PositionController {
             }
 
             Position.find({name: name})
-            .then(() => {
-                if (existingChucVu) {
+            .then((position) => {
+                if (position) {
                     return res.status(409).json({
                         message: "Tên chức vụ đã tồn tại. Vui lòng sử dụng chức vụ khác."
                     });
@@ -55,19 +55,23 @@ class PositionController {
             const limitNumber = parseInt(limit, 10);
             const skip = (pageNumber - 1) * limitNumber;
             const query = {};
+
+            if (name) {
+                // query.name = { $regex: name, $options: 'i' }; // Tìm kiếm không phân biệt chữ hoa chữ thường
+                query.name = { $regex: `.*${name}.*`, $options: 'i' }; // Tìm kiếm gần đúng
+            }
             
-            const totalChucVu = await ChucVu.countDocuments(query); // Đếm tổng số chức vụ
+            const totalChucVu = await Position.countDocuments(query); // Đếm tổng số chức vụ
+            // console.log('totalChucVu: ', totalChucVu)
 
             const totalPages = Math.ceil(totalChucVu / limitNumber); // Tính số trang
 
             Position.find({})
+            .skip(skip)
+            .limit(limitNumber)
             .then((position) => {
-                position
-                .skip(skip)
-                .limit(limitNumber)
-                
                 return res.status(200).json({
-                    data: fetchAll,
+                    data: position,
                     totalChucVu,
                     totalPages,
                     currentPage: pageNumber,
