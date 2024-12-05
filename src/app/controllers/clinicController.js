@@ -80,84 +80,64 @@ class clinicController {
 
     // Post /clinic/create-clinic
     async create(req,res,next){
-        try{
-            let {name, description} = req.body               
-                        
-            if (!name || !description) {
+        try {
+            let {name, address, description , image} = req.body       
+            console.log("anhr: ", image);
+                    
+            
+            if (!name || !address) {
                 return res.status(400).json({
-                    message: "Vui lòng cung cấp đầy đủ thông tin"
+                    message: "Vui lòng cung cấp đầy đủ thông tin (tên phòng khám, địa chỉ)"
                 });
-            }
+            }                   
 
-            Clinic.find({ name: { $regex: new RegExp(`^${name}$`, 'i') } })
-            .then((clinic) => {
-                if(clinic){
-                    return res.status(409).json({
-                        message: "Tên chức vụ đã tồn tại. Vui lòng sử dụng chức vụ khác."
-                    });
-                }
-            })
-
-            const FormData = new Clinic ({
-                name: name,
-                description: description,
-            })
-
-            const newclinict = {};
-            await FormData.save({})
-            .then((clinic) => newclinict = clinic)
-            .catch(next);
-
-            if(newclinict){
-                console.log("thêm thành công chức vụ");
+            let createPhongKham = await Clinic.create({name, address, description , image})
+            
+            if(createPhongKham) {
+                console.log("thêm thành công phòng khám");
                 return res.status(200).json({
-                    data: createChucVu,
-                    message: "Thêm chức vụ bác sĩ thành công"
+                    data: createPhongKham,
+                    message: "Thêm phòng khám thành công"
                 })
-            }else{
+            } else {
                 return res.status(404).json({                
-                    message: "Thêm chức vụ bác sĩ thất bại"
+                    message: "Thêm phòng khám thất bại"
                 })
             }
-        }catch(error){
+
+        } catch (error) {
             console.error(error);
             return res.status(500).json({
-                message: "Có lỗi xảy ra khi thêm chức vụ bác sĩ.",
+                message: "Có lỗi xảy ra khi thêm phòng khám.",
                 error: error.message,
             });
         }
     }
 
-    // Post /clinic/update-clinic
-    update(req,res,next){
-        try{
-            let {_id, name, description} = req.body
-            console.log("id: ",_id);
-
-            const updateclinic = {}
-
-            Clinic.updateOne({_id: _id},{name, description})
-            .then((clinic) => updateclinic =clinic)
-            .catch(next);
-
-            if(updateclinic){
-                console.log("Chỉnh sửa thành công chức vụ");
-                return res.status(200).json({
-                    data: createChucVu,
-                    message: "Chỉnh sửa chức vụ bác sĩ thành công"
-                })
-            }else{
-                return res.status(404).json({                
-                    message: "Chỉnh sửa chức vụ bác sĩ thất bại"
-                })
-            }
-        }catch(error){
-            console.error(error);
-            return res.status(500).json({
-                message: "Có lỗi xảy ra khi Chỉnh sửa tài khoản bác sĩ.",
-                error: error.message,
+    // Put /clinic/update-clinic
+    update(req,res){
+            console.log("id: ",req.body._id);
+            Clinic.findByIdAndUpdate({_id: req.body._id}, req.body)
+            .then((clinic) => {
+                if(clinic){
+                    console.log("Chỉnh sửa thành công chức vụ");
+                    return res.status(200).json({
+                        data: clinic,
+                        message: "Chỉnh sửa chức vụ bác sĩ thành công"
+                    })
+                }else{
+                    return res.status(404).json({                
+                        message: "Chỉnh sửa chức vụ bác sĩ thất bại"
+                    })
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+                return res.status(500).json({
+                    message: "Có lỗi xảy ra khi Chỉnh sửa tài khoản bác sĩ.",
+                    error: error.message,
+                });
             });
-        }
     }
 
 };

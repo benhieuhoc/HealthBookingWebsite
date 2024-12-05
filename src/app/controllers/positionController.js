@@ -3,43 +3,40 @@ const Position = require ('../models/Position')
 class PositionController {
 
     // Post /position/create-position
-    create(req,res,next){
-        try{
-            let {name, description} = req.body
-
-            if (!name || !description) {
+    async create(req,res,next){
+        try {
+            let {name, description} = req.body               
+            
+            if (!name) {
                 return res.status(400).json({
                     message: "Vui lòng cung cấp đầy đủ thông tin (name)"
                 });
             }
 
-            Position.find({name: name})
-            .then((position) => {
-                if (position) {
-                    return res.status(409).json({
-                        message: "Tên chức vụ đã tồn tại. Vui lòng sử dụng chức vụ khác."
-                    });
-                }
-            })
+            // tìm tên chức vụ bác sĩ chính xác nếu trùng thì không được thêm
+            const existingChucVu = await Position.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+            if (existingChucVu) {
+                return res.status(409).json({
+                    message: "Tên chức vụ đã tồn tại. Vui lòng sử dụng chức vụ khác."
+                });
+            }            
 
-            const FormData = new Position({
-                name: name,
-                description: description,
-            })
-            FormData.save({})
-            .then((position) => {
+            let createChucVu = await Position.create({name, description})
+            
+            if(createChucVu) {
                 console.log("thêm thành công chức vụ");
                 return res.status(200).json({
                     data: createChucVu,
                     message: "Thêm chức vụ bác sĩ thành công"
                 })
-            })
-            .catch((next) => {
+            } else {
                 return res.status(404).json({                
                     message: "Thêm chức vụ bác sĩ thất bại"
                 })
-            })
-        }catch (error){
+            }
+
+        } catch (error) {
+            console.error(error);
             return res.status(500).json({
                 message: "Có lỗi xảy ra khi thêm chức vụ bác sĩ.",
                 error: error.message,
@@ -116,8 +113,10 @@ class PositionController {
     // Delete /position/delete-position/:id
     delete(req,res,next){
         try{
-            Position.deleteOne({_id: req.param.id})
+            const _id = req.params.id;
+            Position.deleteOne({_id: _id})
             .then((position) => {
+                console.log("thành công")
                 return res.status(200).json({
                     data: position,
                     message: "Bạn đã xoá chức vụ bác sĩ thành công!"
@@ -125,6 +124,7 @@ class PositionController {
             })
             .catch(next);
         }catch(error){
+            console.log("Thất bại");
             return res.status(500).json({
                 message: "Bạn đã xoá chức vụ bác sĩ thất bại!"
             })

@@ -4,57 +4,69 @@ const Doctor = require('../models/Doctor');
 const Role = require('../models/Role');
 require('dotenv').config();
 const JWT_SECRET = process.env.JWT_SECRET;
+const moment = require('moment-timezone');
 
 
 class DoctorController {
 
     // Post /doctor/create-doctor
     async create(req,res,next){
-        let {email, password, firstName, lastName, address, phoneNumber, giaKhamVN, giaKhamNuocNgoai,
-            chucVuId, gender, image, chuyenKhoaId, phongKhamId, roleId, mota,  } = req.body;
+        try {
+            let {email, password, firstName, lastName, address, phoneNumber, giaKhamVN, giaKhamNuocNgoai,
+                chucVuId, gender, image, chuyenKhoaId, phongKhamId, roleId, mota,  } = req.body
 
-        console.log("chucVuId: ",chucVuId);
-        console.log("chuyenKhoaId: ",chuyenKhoaId);
-        console.log("giaKhamVN: ",giaKhamVN);
+                console.log("chucVuId: ",chucVuId);
+                console.log("chuyenKhoaId: ",chuyenKhoaId);
+                console.log("giaKhamVN: ",giaKhamVN);
+                console.log("giaKhamNuocNgoai: ",giaKhamNuocNgoai);
+                
+            
+            if (!email || !password || !firstName || !lastName) {
+                return res.status(400).json({
+                    message: "Vui lòng cung cấp đầy đủ thông tin (email, password, firstName, lastName)"
+                });
+            }
 
-        // Kiểm tra thông tin gửi đi từ client
-        if (!email || !password || !firstName || !lastName) {
-            return res.status(400).json({
-                message: "Vui lòng cung cấp đầy đủ thông tin (email, password, firstName, lastName)"
-            });
-        };
-
-        // Kiểm tra email đã tồn tại hay chưa
-        Doctor.find({email: email})
-        .then((doctor) => {
-            if(doctor){
+            const existingDoctor = await Doctor.findOne({ email: email });
+            if (existingDoctor) {
+                console.log('lỗi email: ',existingDoctor);
                 return res.status(409).json({
                     message: "Email đã tồn tại. Vui lòng sử dụng email khác."
                 });
             }
-        });
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+            // Hash the password
+            const hashedPassword = await bcrypt.hash(password, 10);
 
-        const FormData = new Doctor({
-            email, 
-            password: hashedPassword, 
-            firstName, lastName, address, phoneNumber, 
-            chucVuId: chucVuId || [], 
-            gender, image, 
-            chuyenKhoaId: chuyenKhoaId || [], 
-            roleId, mota, giaKhamVN, giaKhamNuocNgoai,
-            // phongKhamId, 
-        });
-
-        await FormData.save()
-        .then((doctor) => {
-            res.status(200).json({
-                message: "Thêm tài khoản bác sĩ thành công",
-                data: doctor,
+            let createDoctor = await Doctor.create({
+                email, 
+                password: hashedPassword, 
+                firstName, lastName, address, phoneNumber, 
+                chucVuId: chucVuId || [], 
+                gender, image, 
+                chuyenKhoaId: chuyenKhoaId || [], 
+                phongKhamId, roleId, mota, giaKhamVN, giaKhamNuocNgoai,                
             })
-        })
-        .catch(next)
+            
+            if(createDoctor) {
+                console.log("thêm thành công tài khoản");
+                return res.status(200).json({
+                    data: createDoctor,
+                    message: "Thêm tài khoản bác sĩ thành công"
+                })
+            } else {
+                return res.status(404).json({                
+                    message: "Thêm tài khoản bác sĩ thất bại"
+                })
+            }
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                message: "Có lỗi xảy ra khi thêm tài khoản bác sĩ.",
+                error: error.message,
+            });
+        }
     }
 
     // Post /doctor/login-doctor
@@ -210,7 +222,7 @@ class DoctorController {
     }
 
     // Put /doctor/update-doctor
-    update(req,res,error){
+    update(req,res){
         console.log("id: ",req.body._id);
         Doctor.findOneAndUpdate({_id: req.body._id}, req.body)
         .then((doctor) => {
@@ -252,41 +264,45 @@ class DoctorController {
     }
 
     // Post /doctor/add-shift
-    addshift(req,res,next){
+    async addshift(req,res,next){
         const { date, time, _id } = req.body;
         console.log("date: ", date);
         console.log("time: ", time);
         console.log("_id: ", _id);
-            
-        try{
-            Doctor.findById(_id)
-            .then(async(doctor) => {
-                if(!doctor){
-                    return res.status(404).json({ message: 'Bác sĩ không tồn tại!' });
-                }
-
-                const requestDate = moment(date, 'DD-MM-YYYY').startOf('day').format('YYYY-MM-DD');
-                if (!moment(requestDate, 'YYYY-MM-DD', true).isValid()) {
-                    return res.status(400).json({ message: 'Ngày không hợp lệ!' });
-                }
-
-                const existingTimeSlot = doctor.thoiGianKham.find(slot => slot.date === requestDate);
-                if (existingTimeSlot) {
-                    // Update existing time slot
-                    const existingTimeIds = existingTimeSlot.thoiGianId.map(id => id.toString());
-                    const newTimeIds = time.filter(timeId => !existingTimeIds.includes(timeId));
-                    existingTimeSlot.thoiGianId = [...new Set([...existingTimeSlot.thoiGianId, ...newTimeIds])];
-                } else {
-                    // Create a new time slot if none exists
-                    doctor.thoiGianKham.push({ date: requestDate, thoiGianId: time });
-                }
-
+        
+        try {
+            const doctor = await Doctor.findById(_id);
+            if (!doctor) {
+                return res.status(404).json({ message: 'Bác sĩ không tồn tại!' });
+            }
+    
+            // Convert date from request, ensuring the correct format
+            const requestDate = moment(date, 'DD-MM-YYYY').startOf('day').format('YYYY-MM-DD');
+    
+            if (!moment(requestDate, 'YYYY-MM-DD', true).isValid()) {
+                return res.status(400).json({ message: 'Ngày không hợp lệ!' });
+            }
+    
+            // Check if there's already a time slot for the given date
+            const existingTimeSlot = doctor.thoiGianKham.find(slot => slot.date === requestDate);
+    
+            if (existingTimeSlot) {
+                // Update existing time slot
+                const existingTimeIds = existingTimeSlot.thoiGianId.map(id => id.toString());
+                const newTimeIds = time.filter(timeId => !existingTimeIds.includes(timeId));
+                existingTimeSlot.thoiGianId = [...new Set([...existingTimeSlot.thoiGianId, ...newTimeIds])];
+            } else {
+                // Create a new time slot if none exists
+                doctor.thoiGianKham.push({ date: requestDate, thoiGianId: time });
+            }
+    
+            // Call the removeExpiredTimeSlots method to clean up any expired time slots
             await doctor.removeExpiredTimeSlots();
+    
+            // Save changes
             await doctor.save();
             return res.status(200).json({ message: 'Cập nhật lịch trình khám bệnh thành công!', data: doctor });
-            })
-            .catch(next);
-        }catch (error){
+        } catch (error) {
             console.error(error);
             return res.status(500).json({ message: 'Có lỗi xảy ra!', error });
         }

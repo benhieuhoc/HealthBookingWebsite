@@ -4,39 +4,40 @@ class departmentController {
 
     // Post /department/create-department
     async create(req,res,next){
-        try{
-            let {name, description , image} = req.body
-
-            if(!name || !description || !image){
-                return res.status(400).json({
-                    message: "Vui lòng cung cấp đầy đủ thông tin "
+        try {
+            let {name, description , image} = req.body       
+            console.log("anhr: ", image);
+                 
+            // tìm tên chuyên khoa bác sĩ chính xác nếu trùng thì không được thêm
+            const existingChuyenKhoa = await Department.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+            if (existingChuyenKhoa) {
+                return res.status(409).json({
+                    message: "Tên chuyên khoa đã tồn tại. Vui lòng sử dụng chuyên khoa khác."
                 });
-            }
+            }  
+            
+            if (!name) {
+                return res.status(400).json({
+                    message: "Vui lòng cung cấp đầy đủ thông tin (tên chuyên khoa)"
+                });
+            }                   
 
-            Department.find({name: name})
-            .then((department) =>{
-                if(department){
-                    return res.status(409).json({
-                        message: "Tên chuyên khoa đã tồn tại. Vui lòng sử dụng chuyên khoa khác."
-                    });
-                }
-            })
-
-            const FormData = new Department({
-                name: name,
-                description: description,
-                image: image,
-            })
-            FormData.save({})
-            .then((department) => {
+            let createChuyenKhoa = await Department.create({name, description , image})
+            
+            if(createChuyenKhoa) {
+                console.log("thêm thành công chuyên khoa");
                 return res.status(200).json({
-                    data: department,
+                    data: createChuyenKhoa,
                     message: "Thêm chuyên khoa thành công"
                 })
-            })
-            .catch(next);
+            } else {
+                return res.status(404).json({                
+                    message: "Thêm chuyên khoa thất bại"
+                })
+            }
 
-        }catch (error){
+        } catch (error) {
+            console.error(error);
             return res.status(500).json({
                 message: "Có lỗi xảy ra khi thêm chuyên khoa.",
                 error: error.message,
@@ -109,8 +110,7 @@ class departmentController {
     }
 
     // Put /department/update-department
-    update(req,res,next){
-        try{
+    update(req,res){
             Department.findOneAndUpdate ({_id: req.body._id}, req.body)
             .then((department) => {
                 if(department){
@@ -125,12 +125,12 @@ class departmentController {
                     })
                 }
             })
-        }catch (error){
-            return res.status(500).json({
-                message: "Có lỗi xảy ra khi Chỉnh sửa chuyên khoa.",
-                error: error.message,
-            });
-        }
+            .catch((error) => {
+                return res.status(500).json({
+                    message: "Có lỗi xảy ra khi Chỉnh sửa chuyên khoa.",
+                    error: error.message,
+                });
+            })
     }
 
     // Delete /department/delete-department/:id
