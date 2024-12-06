@@ -99,7 +99,7 @@ class departmentController {
                 }else{
                     return res.status(200).json({
                         message: "Đã tìm thấy Chuyên khoa",
-                        data: chuyenKhoa
+                        data: department
                     });
                 }
             })

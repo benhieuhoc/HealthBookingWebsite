@@ -198,13 +198,12 @@ class DoctorController {
     showbydepartment(req,res,next){
         try{
             Doctor.find ({chuyenKhoaId: req.query.idChuyenKhoa})
+            .populate("chucVuId chuyenKhoaId phongKhamId roleId")
+            .populate({
+                path: 'thoiGianKham.thoiGianId', // Đường dẫn đến trường cần populate
+                model: 'Shift' // Tên model của trường cần populate
+            })
             .then((doctor) => {
-                doctor
-                .populate("chucVuId chuyenKhoaId phongKhamId roleId")
-                .populate({
-                    path: 'thoiGianKham.thoiGianId', // Đường dẫn đến trường cần populate
-                    model: 'ThoiGianGio' // Tên model của trường cần populate
-                })
             if(doctor){
                 return res.status(200).json({
                     message: "Đã tìm thấy Doctor",

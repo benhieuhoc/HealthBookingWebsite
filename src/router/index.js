@@ -1,4 +1,5 @@
 const adminController = require ('./account/admin');
+const bookingController = require ('./booking');
 const clinicController = require ('./clinic');
 const departmentController = require ('./department');
 const doctorController = require ('./account/doctor');
@@ -11,6 +12,7 @@ const siteController = require ('./site');
 
 function route(app) {
     app.use('/admin', adminController);
+    app.use('/booking',bookingController);
     app.use('/clinic', clinicController);
     app.use('/department', departmentController);
     app.use('/doctor', doctorController);
