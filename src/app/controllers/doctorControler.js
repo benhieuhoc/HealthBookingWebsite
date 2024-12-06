@@ -174,15 +174,13 @@ class DoctorController {
     showbyid(req,res,next){
         try{
             Doctor.findById(req.query.id)
+            .populate("chucVuId chuyenKhoaId phongKhamId roleId")
+            .populate({
+                path: 'thoiGianKham.thoiGianId', // Đường dẫn đến trường cần populate
+                model: 'Shift' // Tên model của trường cần populate
+            })
             .then((doctor) => {
                 if(doctor){
-                    doctor
-                    .populate("chucVuId chuyenKhoaId phongKhamId roleId")
-                    .populate({
-                        path: 'thoiGianKham.thoiGianId', // Đường dẫn đến trường cần populate
-                        model: 'ThoiGianGio' // Tên model của trường cần populate
-                    })
-
                     return res.status(200).json({
                         message: "Đã tìm thấy bác sĩ",
                         data: doctor
