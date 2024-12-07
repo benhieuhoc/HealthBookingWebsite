@@ -5,6 +5,7 @@ const Role = require('../models/Role');
 require('dotenv').config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const moment = require('moment-timezone');
+const Shift = require('../models/Shift');
 
 
 class DoctorController {
@@ -314,7 +315,7 @@ class DoctorController {
                 return res.status(404).json({ message: 'Bác sĩ không tồn tại!' });
             }
 
-            const timeGio = await ThoiGianGio.findById(idGioKhamBenh);
+            const timeGio = await Shift.findById(idGioKhamBenh);
             if (!timeGio) { 
                 return res.status(404).json({ message: 'Giờ bạn muốn tìm nằm ngoài giờ hành chính!' });
             }

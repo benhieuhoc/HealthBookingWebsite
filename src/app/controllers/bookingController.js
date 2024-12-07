@@ -10,6 +10,8 @@ class BookingController{
                 hinhThucTT, tenGioKham, ngayKhamBenh, giaKham
             } = req.body
 
+            console.log ('1')
+
             // Tách ngày
             const [day, month, year] = ngayKhamBenh.split('/').map(Number);
             const appointmentDate = new Date(year, month - 1, day);
@@ -60,6 +62,40 @@ class BookingController{
             });
 
         }catch (error){
+            console.error(error);
+            return res.status(500).json({ message: 'Có lỗi xảy ra!', error });
+        }
+    }
+
+    // Get booking/show-booking
+    async show(req, res) {
+        try {
+            let idKH = req.query.idKhachHang
+
+            const findLichHen = await Booking.find({_idTaiKhoan: idKH})
+            .populate("_idDoctor _idTaiKhoan")
+            .populate({
+                path: '_idDoctor',
+                populate: [
+                    { path: 'chucVuId' }, 
+                    { path: 'chuyenKhoaId' }, 
+                    { path: 'phongKhamId' }, 
+                ]
+            })
+            .populate({
+                path: '_idTaiKhoan',
+                model: 'Patient' 
+            })
+
+            if (!findLichHen) { 
+                return res.status(404).json({ message: 'Tìm lịch hẹn thất bại!' });
+            }
+
+            return res.status(200).json({ message: 'Tìm lịch hẹn thành công!', 
+                data: findLichHen
+            });
+
+        } catch (error) {
             console.error(error);
             return res.status(500).json({ message: 'Có lỗi xảy ra!', error });
         }
