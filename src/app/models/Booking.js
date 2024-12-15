@@ -13,7 +13,8 @@ const BookingSchema = new mongoose.Schema({
     hinhThucTT: { type: Boolean },        
     tenGioKham: { type: String },        
     ngayKhamBenh: { type: String },        
-    giaKham: { type: String },        
+    giaKham: { type: String },       
+    checkin: { type: Boolean }, 
     },
     { 
         timestamps: true,   // createAt, updateAt

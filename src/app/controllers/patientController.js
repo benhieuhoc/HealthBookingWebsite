@@ -6,45 +6,48 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 class PatientController {
 
-    // Post /login-patient
+    // Post /patient/login-patient
     login(req, res, next){
         const {email, password} = req.body
-
-        Patient.findOne({email})
-        .then (async(patient) => {
-            if(!patient) {
-                return res.status(401).json({ message: 'Email không tồn tại' });
-            }
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-            console.log("patient.password: ",patient.password);
-            console.log("password: ",password);
-            console.log("hashedPassword: ",hashedPassword);
-            console.log('EXPIRESIN:', process.env.EXPIRESIN);
-            console.log('JWT_SECRET:', JWT_SECRET);
-
-            // So sánh mật khẩu với bcrypt
-            const isMatch = bcrypt.compare(password, patient.password);
-            if (!isMatch) {
-                return res.status(401).json({ message: 'Mật khẩu không chính xác' });
-            }
-
-            // Tạo token JWT
-            const token = jwt.sign(
-                { benhNhanId: patient._id, email: patient.email },
-                JWT_SECRET,
-                { expiresIn: process.env.EXPIRESIN } // Thời gian hết hạn của token
-            );
-
-            // Trả về thông tin patient (có thể trả về thông tin khác tùy nhu cầu)
-            res.json({ message: 'Đăng nhập thành công', access_token: token, data: patient });
-            console.log(`Đăng nhập thành công với token: ${token}`);
-        })
-        .catch(next);
+        try{
+            Patient.findOne({email: email})
+            .then (async(patient) => {
+                if(!patient) {
+                    return res.status(401).json({ message: 'Email không tồn tại' });
+                }
+                const saltRounds = 10;
+                const hashedPassword = await bcrypt.hash(password, saltRounds);
+    
+                console.log("patient.password: ",patient.password);
+                console.log("password: ",password);
+                console.log("hashedPassword: ",hashedPassword);
+                console.log('EXPIRESIN:', process.env.EXPIRESIN);
+                console.log('JWT_SECRET:', JWT_SECRET);
+    
+                // So sánh mật khẩu với bcrypt
+                const isMatch = await bcrypt.compare(password, patient.password);
+                if (!isMatch) {
+                    return res.status(401).json({ message: 'Mật khẩu không chính xác' });
+                }
+    
+                // Tạo token JWT
+                const token = jwt.sign(
+                    { benhNhanId: patient._id, email: patient.email },
+                    JWT_SECRET,
+                    { expiresIn: process.env.EXPIRESIN } // Thời gian hết hạn của token
+                );
+    
+                // Trả về thông tin patient (có thể trả về thông tin khác tùy nhu cầu)
+                res.json({ message: 'Đăng nhập thành công', access_token: token, data: patient });
+                console.log(`Đăng nhập thành công với token: ${token}`);
+            })
+        }catch (error){
+            console.error(error);
+            res.status(500).json({ message: 'Lỗi máy chủ' });
+        }
     }
 
-    // Post /logout-patient
+    // Post /patient/logout-patient
     logout(req,res,next){
         try {
             // Xóa cookie chứa token
@@ -61,7 +64,7 @@ class PatientController {
         }
     }
 
-    // Post /register-patient
+    // Post /patient/register-patient
     async register(req,res,next){
         const {email, password, firstName, lastName, address, phone, gender} = req.body;
         try{
@@ -102,6 +105,135 @@ class PatientController {
         }
     }
 
+    //Get /patient/infor
+    async infor(req,res){
+        const id = req.params.id;
+        try{
+            console.log("id user: ", id)
+            const finduser = await Patient.findOne({_id: id})
+
+            if(!finduser){
+                return res.status(404).json({message: "Người dùng này không tồn tại!!!"})
+            }else{
+                return res.status(200).json({
+                    data: finduser,
+                    message: "Đã tìm thấy thông tin người dùng"
+                })
+            }
+        }catch(error){
+            return res.status(500).json({ success: false , message: "Lỗi hệ thống"});
+        }
+    }
+
+    // Put /patient/update
+    update(req, res, next){
+        console.log("id: ",req.body);
+        Patient.findOneAndUpdate({_id: req.body._id}, req.body)
+        .then((patient) => {
+            if(patient){
+                return res.status(200).json({
+                    data: patient,
+                    message: "Chỉnh sửa tài khoản thành công"
+                })
+            }else{
+                return res.status(404).json({                
+                    message: "Chỉnh sửa tài khoản thất bại"
+                })
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            return res.status(500).json({
+                message: "Có lỗi xảy ra !!!",
+                error: error.message,
+            });
+        })
+    }
+
+    // Patch /patient/change-pasword
+    password(req,res,next){
+        const {_id, password , passwordchange} = req.body
+        // console.log("req: ", req)
+        Patient.findOne({_id})
+        .then (async(patient) => {
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            console.log("password: ",password);
+            console.log("hashedPassword: ",hashedPassword);
+            console.log("patient.password: ",patient.password);
+
+            // So sánh mật khẩu với bcrypt
+            const isMatch = await bcrypt.compare(password, patient.password);
+            console.log("isMatch: ", isMatch)
+            if (!isMatch) {
+                return res.status(401).json({ message: 'Mật khẩu không chính xác' });
+            }
+            const hashedPasswordChange = await bcrypt.hash(passwordchange, saltRounds);
+            Patient.findOneAndUpdate({_id: _id}, {password: hashedPasswordChange})
+            .then((patient) => {
+                if(patient){
+                    return res.status(200).json({
+                        data: patient,
+                        message: "Đổi mật khẩu thành công"
+                    })
+                }else{
+                    return res.status(404).json({                
+                        message: "Đổi mật khẩu thất bại"
+                    })
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+                return res.status(500).json({
+                    message: "Có lỗi xảy ra !!!",
+                    error: error.message,
+                });
+            })
+        })
+        .catch((error) => {
+            console.error(error);
+            return res.status(500).json({
+                message: "Có lỗi xảy ra !!!",
+                error: error.message,
+            });
+        })
+    }
+
+    // Patch /patient/change-avata
+    avata(req,res){
+        const {_id, image} = req.body
+        // console.log("req: ", req)
+        Patient.findOne({_id})
+        .then ((patient) => {
+            Patient.findOneAndUpdate({_id: _id}, {image: image})
+            .then((patient) => {
+                if(patient){
+                    return res.status(200).json({
+                        data: patient,
+                        message: "Đổi ảnh đại diện thành công"
+                    })
+                }else{
+                    return res.status(404).json({                
+                        message: "Đổi ảnh đại diện thất bại"
+                    })
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+                return res.status(500).json({
+                    message: "Có lỗi xảy ra !!!",
+                    error: error.message,
+                });
+            })
+        })
+        .catch((error) => {
+            console.error(error);
+            return res.status(500).json({
+                message: "Có lỗi xảy ra !!!",
+                error: error.message,
+            });
+        })
+    }
 }
 
 module.exports = new PatientController;

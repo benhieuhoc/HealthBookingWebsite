@@ -73,8 +73,8 @@ class DoctorController {
     // Post /doctor/login-doctor
     login(req,res,next){
         const {email, password} = req.body
-
-        Doctor.findOne({email})
+        console.log("req: ", req.body)
+        Doctor.findOne({email : email})
         .then (async(doctor) => {
             if(!doctor) {
                 return res.status(401).json({ message: 'Email không tồn tại' });
@@ -174,6 +174,9 @@ class DoctorController {
     // Get /doctor/show-doctor-byId
     showbyid(req,res,next){
         try{
+            if (!req.body.id) {
+                return res.status(404).json({ message: 'Bác sĩ không tồn tại!' });
+            }
             Doctor.findById(req.query.id)
             .populate("chucVuId chuyenKhoaId phongKhamId roleId")
             .populate({
@@ -310,6 +313,9 @@ class DoctorController {
     async showwithbooking(req,res,next){
         try{
             const { id, idGioKhamBenh, ngayKham } = req.query; // Lấy doctorId và date từ query
+            if (!id) {
+                return res.status(404).json({ message: 'Bác sĩ không tồn tại!' });
+            }
             const doctor = await Doctor.findById(id).populate("chucVuId chuyenKhoaId phongKhamId roleId")
             if (!doctor) {
                 return res.status(404).json({ message: 'Bác sĩ không tồn tại!' });

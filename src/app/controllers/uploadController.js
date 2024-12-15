@@ -41,7 +41,7 @@ const uploadFile = (req, res) => {
         }
 
         const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-        res.json({ url: fileUrl });
+        res.json({ url: fileUrl , name: req.file.filename});
     });
 };
 

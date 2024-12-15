@@ -46,11 +46,12 @@ class BookingController{
                     return res.status(400).json({ message: 'Có vẻ lịch khám này đã có bệnh nhân đăng ký rồi. Vui lòng chọn thời gian khác.' });
                 }
             }
-
+            const checkin = false;
             let datlich = await Booking.create({
                 _idDoctor, _idTaiKhoan, patientName, email,
                 gender, phone, dateBenhNhan, address, lidokham, 
-                hinhThucTT, tenGioKham, ngayKhamBenh, giaKham
+                hinhThucTT, tenGioKham, ngayKhamBenh, giaKham, checkin,
+
             })
 
             if (!datlich) { 
@@ -98,6 +99,24 @@ class BookingController{
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: 'Có lỗi xảy ra!', error });
+        }
+    }
+
+    // Patch booking/checkin/:id
+    async checkin(req,res){
+        const _id = req.params.id;
+        try{
+            const findbooking = await Booking.find({_id: _id})
+            if(!findbooking)
+            {
+                return res.status(404).json({ message: 'Lịch hẹn này không tồn tại'})
+            }
+            Booking.findByIdAndUpdate({_id: _id}, {checkin: true})
+            .then((booking) => {
+                return res.status(200).json({ message: 'Checkin bệnh nhân hoàn tất', data: booking})
+            })
+        }catch (error){
+            return res.status(500).json({ message: 'Có lỗi xảy ra' })
         }
     }
 
