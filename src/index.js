@@ -7,10 +7,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 // Khai báo morgan
 const morgan = require('morgan');
-// Khai báo handlebars
-const handlebars = require ('express-handlebars');
-// Khai báo express-session
-const session = require ('express-session')
 // Khai báo router điều hướng
 const router = require ('./router/index');
 // Khai báo path
@@ -30,25 +26,6 @@ app.use(morgan('combined'));
 
 //Cho phép client truy cập vaog folder "public"
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Triển khai handlebars
-app.engine(
-    '.hbs', 
-    handlebars.engine({
-        extname: '.hbs',
-        helpers: require ('./app/middlewares/HelperHandlebar'),
-    }),
-);
-app.set('view engine', 'hbs');
-app.set('views', './src/resources/views');
-
-// Khởi tạo express-session
-app.use(session({
-    secret: 'your_secret_key',
-  resave: false,
-  saveUninitialized: false,
-  store: ConnectMongo.create({mongoUrl: 'mongodb://localhost:27017/HealthBookingWebsite_dev'})
-}));
 
 // cài đặt cors
 const allowedOrigins = [

@@ -2,7 +2,7 @@ const Booking = require ("../models/Booking");
 
 class BookingController{
 
-    // Post /booking//dat-lich-kham
+    // Post /booking/dat-lich-kham
     async datLichKham(req,res){
         try{
             const {_idDoctor, _idTaiKhoan, patientName, email,
@@ -120,6 +120,51 @@ class BookingController{
         }
     }
 
+    // Get /booking/show-all-booking
+    async showall(req,res,next){
+        const { page, limit } = req.query; // Lấy trang và kích thước trang từ query
+        // Chuyển đổi thành số
+        const pageNumber = parseInt(page, 10);
+        const limitNumber = parseInt(limit, 10);
+        // Tính toán số bản ghi bỏ qua
+        const skip = (pageNumber - 1) * limitNumber;
+        const totalOrder = await Booking.countDocuments(); // Đếm tổng số bác sĩ
+        const totalPages = Math.ceil(totalOrder / limitNumber); // Tính số trang
+
+        Booking.find()
+        .skip(skip)
+        .limit(limitNumber)
+        .then((booking) => {
+            return res.status(200).json({
+                data: booking,
+                totalOrder,
+                totalPages,
+                currentPage: pageNumber,
+                message: "Đã tìm ra tất cả lịch hẹn",
+            });
+        })
+        .catch(next);
+    }
+
+    // Delete /booking/delete/:id
+    delete(req,res){
+        try{
+            const id = req.params.id;
+            console.log("id: ", id)
+            Booking.deleteOne({_id: id})
+            .then((booking) => {
+                return res.status(200).json({
+                    data: booking,
+                    message: "Xóa lịch hẹn thành công"
+                })
+            })
+            .catch(() => {
+                return res.status(500).json({message:"Xóa lịch hẹn thất bại"})
+            })
+        }catch(error){
+            return res.status(500).json({message:error})
+        }
+    }
 };
 
 module.exports = new BookingController

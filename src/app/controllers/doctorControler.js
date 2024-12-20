@@ -173,8 +173,9 @@ class DoctorController {
 
     // Get /doctor/show-doctor-byId
     showbyid(req,res,next){
+        console.log(req.query.id)
         try{
-            if (!req.body.id) {
+            if (!req.query.id) {
                 return res.status(404).json({ message: 'Bác sĩ không tồn tại!' });
             }
             Doctor.findById(req.query.id)
