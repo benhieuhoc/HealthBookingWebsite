@@ -108,7 +108,7 @@ class DoctorController {
         .catch(next);
     }
 
-    // Post /doctor/logout_doctor
+    // Post /doctor/logout-doctor
     logout(req,res,next){
         try {
             // Xóa cookie chứa token
@@ -173,12 +173,13 @@ class DoctorController {
 
     // Get /doctor/show-doctor-byId
     showbyid(req,res,next){
-        console.log(req.query.id)
+        const id = req.query.id;
+        console.log("id bacsi: ",id)
         try{
-            if (!req.query.id) {
+            if (!id) {
                 return res.status(404).json({ message: 'Bác sĩ không tồn tại!' });
             }
-            Doctor.findById(req.query.id)
+            Doctor.findById(id)
             .populate("chucVuId chuyenKhoaId phongKhamId roleId")
             .populate({
                 path: 'thoiGianKham.thoiGianId', // Đường dẫn đến trường cần populate

@@ -16,8 +16,10 @@ const db = require ('./config/db');
 // Khai báo connect-mongo để hỗ trợ khai báo db cho session
 const ConnectMongo = require ('connect-mongo');
 const { mongo } = require('mongoose');
-// khai báo middleware
-// const AuthenticatedMiddleware = require('./app/middlewares/AuthenticatedMiddleware')
+
+// Tạo chức năng tự động xóa lịch khám
+const moment = require('moment');
+const Doctor = require('./app/models/Doctor')
 
 //Kết nối db
 db.connect();
@@ -57,6 +59,20 @@ app.use(express.urlencoded({ extended: true }));
 
 // Triển khai router
 router(app);
+
+setInterval(async () => {
+    try {
+        const doctors = await Doctor.find();
+  
+        for (const doctor of doctors) {
+            doctor.thoiGianKham = doctor.thoiGianKham.filter(slot => moment(slot.date).isSameOrAfter(moment(), 'day'));
+            await doctor.save();
+        }
+        console.log('Đã tự động xóa các lịch trình cũ thành công!');
+    } catch (error) {
+        console.error('Có lỗi xảy ra khi xóa lịch trình cũ:', error);
+    }
+  }, 1000 * 3600 * 1); // 1 giờ
 
 // Triển khai express
 app.listen(3001);
