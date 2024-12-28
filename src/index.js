@@ -72,7 +72,7 @@ setInterval(async () => {
     } catch (error) {
         console.error('Có lỗi xảy ra khi xóa lịch trình cũ:', error);
     }
-  }, 1000 * 3600 * 1); // 1 giờ
+  }, 1000 * 60 * 60); // 1 giờ
 
 // Triển khai express
 app.listen(3001);

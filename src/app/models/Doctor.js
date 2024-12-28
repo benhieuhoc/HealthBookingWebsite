@@ -51,7 +51,7 @@ DoctorSchema.methods.removeExpiredTimeSlots = async function() {
                     return hour * 60 + minute; // Chuyển đổi sang phút
                 });
 
-                // Lấy ngày của lịch khám (theo kiểu YYYY-MM-DD)
+                // Lấy ngày của lịch khám
                 const thoiGianGioDate = new Date(slot.date);
                 thoiGianGioDate.setHours(0, 0, 0, 0); // Thiết lập giờ, phút, giây, mili giây về 0 để so sánh chỉ ngày
 
@@ -77,8 +77,7 @@ DoctorSchema.methods.removeExpiredTimeSlots = async function() {
     this.thoiGianKham = this.thoiGianKham.filter(slot => slot.thoiGianId.length > 0);
 }; 
 
-
-// Trước khi lưu, gọi hàm removeExpiredTimeSlots
+// Thực hiện xóa trước khi lưu
 DoctorSchema.pre('save', async function(next) {
     await this.removeExpiredTimeSlots();
     next();
